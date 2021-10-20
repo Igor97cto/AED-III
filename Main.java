@@ -11,5 +11,6 @@ public class Main {
 		crdusr = new CRUDUser("user_data", User.class.getConstructor(new Class[] { byte[].class }), true);
 		crdqst = new CRUDQuestion("user_data", Question.class.getConstructor(new Class[] { byte[].class }), true);
 		FrontEndInterface.menuAccess();
+		
 	}
 }

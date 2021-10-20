@@ -15,8 +15,8 @@ public class CRUDUser extends CRUD <User>
 
         //Cria indice hash de Email e ID
         ixemailid= new HashExtensivel<>(ParEmailID.class.getConstructor(), 4,
-        USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_eidix.db",
-                USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_eidix.db");
+        USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_ixemailid.db",
+                USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_ixemailid.db");
     }
 
 

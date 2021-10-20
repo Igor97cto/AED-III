@@ -130,7 +130,14 @@ public class BackEndInterface
 
 	public static boolean listQuestion() throws Exception
 	{
+		Question [] qsta;
+
 		System.out.println("Minhas Perguntas");
+		qsta= Main.crdqst.list(usr.getId());
+
+		for (Question q : qsta) {
+			System.out.println(q);
+		}
 		
 		System.out.println("Pressione qualquer tecla para continuar...");
 		Main.scn.next();
