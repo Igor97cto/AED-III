@@ -8,4 +8,4 @@ Utilizamos a CRUD Genérica indexada desenvolvida pelo Igor, sendo necessário a
 No Main, criamos um código de Menu que acessa os CRUDS de usuario e questões, ademais acessamos o FrontEndInterface.
 
 
-OBS: O trabalho se encontra em falta na implementação correta no que diz respeito as questões.
+OBS: O trabalho se encontra em falta na implementação correta no que diz respeito as questões. A listagem e inserção estão funcional, faltou atualização e arquivamento das perguntas.
