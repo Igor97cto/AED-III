@@ -1,6 +1,5 @@
 package Data_Structures;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Constructor;
@@ -17,20 +16,19 @@ import java.io.DataInputStream;
  * implemente a interface {@code Register}.
  */
 
-public class Crud <T extends Register>
+public class CRUD <T extends Register>
 {
 	
-	private final String FILE_NAME;
-	private final String FILE_FORMAT;
-	private final String FOLDER_NAME;
-	private final String USER_DIR;
+	protected final String FILE_NAME;
+	protected final String FILE_FORMAT;
+	protected final String FOLDER_NAME;
+	protected final String USER_DIR;
 
-	private Constructor<T> cstr;
-	private File flp;
-	private HashExtensivel<ParIDEndereco> ixi;  //index IDEndereco
-  	private HashExtensivel<ParEmailID> ixe;     //index EmailId
-	private RandomAccessFile raf;
+	protected Constructor<T> cstr;
+	protected File flp;
+	protected RandomAccessFile raf;
 	
+	private HashExtensivel<ParIDEndereco> ideix;  //index IDEndereco
 
 	/**
 	 * Cria um novo manipulador de registros genericos compativeis, o arquivo
@@ -52,7 +50,7 @@ public class Crud <T extends Register>
 	 * @throws Exception para excecao de qualquer natureza
 	 */
 
-	public Crud(String filename, Constructor<T> cstr, boolean deletefolder)throws Exception
+	public CRUD(String filename, Constructor<T> cstr, boolean deletefolder) throws Exception
 	{
 		this.cstr= cstr;
 		this.FILE_FORMAT= ".bin";
@@ -62,7 +60,6 @@ public class Crud <T extends Register>
 		
 		//Checa se a pasta existe
 		flp= new File(USER_DIR + "/" + FOLDER_NAME);
-		
 		
 		//Se nao existe, cria
 		if(!(flp.exists()))
@@ -76,20 +73,11 @@ public class Crud <T extends Register>
 			flp.mkdir();
 		}
 		
-    //Cria arquivo de registro
+		//Cria arquivo de registro
 		raf= new RandomAccessFile(USER_DIR + "/" + FOLDER_NAME
 			+ "/" +this.FILE_NAME, "rw");
 
-    //Cria indice de ID e endereco
-		ixi= new HashExtensivel<>(ParIDEndereco.class.getConstructor(), 4,
-			USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_ixi.db",
-				USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_ixi.db");
-
-    //Cria indice de Email e ID
-    ixe= new HashExtensivel<>(ParEmailID.class.getConstructor(), 4,
-      USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_ixe.db",
-				USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_ixe.db");
-
+		//Número de registros
 		if(raf.length()== 0)
 		{
 			raf.writeInt(0);
@@ -110,11 +98,8 @@ public class Crud <T extends Register>
 	 * @throws Exception para excecao de qualquer natureza
 	 */
 
-	public void create(T obj) throws Exception
+	public int create(T obj) throws Exception
 	{
-		int id;
-		String email;
-
 		raf.seek(0);
 
 		int lastid= raf.readInt();
@@ -123,24 +108,19 @@ public class Crud <T extends Register>
 		obj.setId(++lastid);
 		raf.writeInt(lastid);
 		raf.seek(raf.length());
+
 		byte[] ba= obj.toByteArray();
-
-		ByteArrayInputStream bais = new ByteArrayInputStream(ba);
-		DataInputStream dis = new DataInputStream(bais);
-
-		id= dis.readInt();
-		dis.skipBytes(dis.readShort());
-		email= dis.readUTF();
-
-		//indece id e endereco
-		ixi.create(new ParIDEndereco(lastid, raf.getFilePointer()));
-
-		//indece email e id
-		ixe.create(new ParEmailID(email, id));
 
 		raf.writeByte(0); //gravestone
 		raf.writeInt(ba.length); //size of the register
 		raf.write(ba);//register
+
+		//Cria indice hash de ID e endereco
+		ideix= new HashExtensivel<>(ParIDEndereco.class.getConstructor(), 4,
+        USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_ideix.db",
+            USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_ideix.db");
+
+		return lastid;
 	}
 
 
@@ -175,7 +155,7 @@ public class Crud <T extends Register>
 	{
 		T obj= null;
 		long hp;
-		byte[] ba= ixi.read(id).toByteArray();
+		byte[] ba= ideix.read(id).toByteArray();
 		ByteArrayInputStream bais = new ByteArrayInputStream(ba);
 		DataInputStream dis = new DataInputStream(bais);
 
@@ -278,9 +258,9 @@ public class Crud <T extends Register>
 		ByteArrayInputStream bais;
 		DataInputStream dis;
 
-		if(ixi.read(id) != null)
+		if(ideix.read(id) != null)
 		{
-			ba = ixi.read(id).toByteArray();
+			ba = ideix.read(id).toByteArray();
 			bais = new ByteArrayInputStream(ba);
 			dis = new DataInputStream(bais);
 
@@ -291,27 +271,6 @@ public class Crud <T extends Register>
 			
 		return -1;
 	} 
-
-
-	private int getIdByEmail(String email) throws Exception
-	{
-		byte[] ba;
-		ByteArrayInputStream bais;
-		DataInputStream dis;
-
-		if(ixe.read(email.hashCode()) != null)
-		{
-			ba = ixe.read(email.hashCode()).toByteArray();
-			bais = new ByteArrayInputStream(ba);
-			dis = new DataInputStream(bais);
-
-			dis.skipBytes(dis.readUnsignedShort());
-			return dis.readInt();
-		}
-
-		return -1;
-	}
-
 
 	/** 
 	 * Lê um registro de id igual ao valor do parametro {@code id} na tabela
@@ -328,30 +287,9 @@ public class Crud <T extends Register>
 	 * @throws Exception para excecao de qualquer natureza
 	 */
 
-	public T readbyId(int id) throws Exception
+	public T read(int id) throws Exception
 	{
 		return getObjByPointer(getAddrsById(id));
-	}
-
-   /** 
-	* Lê um {@code String email} igual ao valor do parametro {@code email}
-    * na tabela hash de EmailId, recupera o id, em seguida busca o endereco
-    * do objeto na hash de IdEndereco e retorna um objeto criado a partir da
-    * leitura deste registro.
-	* 
-	* O metodo obtem a posicao do cabecote onde esta o registro na tabela hash
-    * de IdEndereco em seguida este valor e passado ao metodo
-    * {@code getObjPointer()} que le o registro e cria um objeto correspondente.
-    * Por fim, o objeto e retornado.
-	* 
-	* @param id valor do registro a ser procurado
-	* @return T objeto correspondente ao registro deletado
-	* @throws Exception para excecao de qualquer natureza
-	*/
-
-  	public T readbyEmail(String email) throws Exception
-	{
-		return readbyId(getIdByEmail(email));
 	}
 
 

@@ -3,12 +3,13 @@ import java.util.Scanner;
 
 public class Main {
 	static Scanner scn;
-	static Crud<User> crd;
+	static CRUDUser crdusr;
+    static CRUDQuestion crdqst;
 
 	public static void main(String[] args) throws Exception {
 		scn = new Scanner(System.in);
-		crd = new Crud<>("data", User.class.getConstructor(new Class[] { byte[].class }), false);
-
+		crdusr = new CRUDUser("user_data", User.class.getConstructor(new Class[] { byte[].class }), true);
+		crdqst = new CRUDQuestion("user_data", Question.class.getConstructor(new Class[] { byte[].class }), true);
 		FrontEndInterface.menuAccess();
 	}
 }

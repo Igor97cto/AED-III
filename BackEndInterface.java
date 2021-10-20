@@ -1,7 +1,12 @@
 import Data_Structures.*;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 public class BackEndInterface
 {
+	static User usr;
+	static Question qst;
+
   	public static boolean userRegister() throws Exception
 	{
 		String name;
@@ -14,7 +19,7 @@ public class BackEndInterface
 		System.out.println("Inserir novo email: ");
 		Main.scn.nextLine();
 		email = Main.scn.nextLine();
-		usr = Main.crd.readbyEmail(email);
+		usr = Main.crdusr.readbyEmail(email);
 
 		// Verificar se email vazio ou muito pequeno
 		if (email.length() < 6)
@@ -39,7 +44,7 @@ public class BackEndInterface
 			// Se confirmar
 			if (conf == 'S' || conf == 's')
 			{
-				Main.crd.create(new User(name, email, password));
+				Main.crdusr.create(new User(name, email, password));
 				System.out.println("Usuário criado com sucesso");
 				status = true;
 			}
@@ -60,7 +65,7 @@ public class BackEndInterface
 		Main.scn.nextLine();
 		email = Main.scn.nextLine();
 
-		usr = Main.crd.readbyEmail(email);
+		usr = Main.crdusr.readbyEmail(email);
 
 		if (usr != null)
 		{
@@ -83,5 +88,52 @@ public class BackEndInterface
 		}
 		// retornar pro 1) cadastro
 		return status;
+	}
+
+
+	public static String deAccent(String str)
+	{
+		String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD);
+		Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+		return pattern.matcher(nfdNormalizedString).replaceAll("");
+	}
+
+
+	public static boolean readQuestion() throws Exception
+	{
+		String pergunta;
+		String palavrasChave;
+		char confirmacao;
+
+		System.out.print("Escreva a sua pergunta: ");
+		pergunta = Main.scn.nextLine();
+		
+		if(pergunta != "")
+		{
+			System.out.print("Escreva as palavras chaves relacionadas a sua pergunta: ");
+			palavrasChave = Main.scn.nextLine();
+			System.out.print("Você confirma a inserção da pergunta[S/N]: " + pergunta);
+			confirmacao = Main.scn.next().charAt(0);
+
+			if (confirmacao == 'S' || confirmacao == 's')
+			{
+				palavrasChave = palavrasChave + ';';
+				palavrasChave = deAccent(palavrasChave);
+				palavrasChave.toLowerCase();
+				palavrasChave = palavrasChave.replaceAll(" ", ";");
+				Main.crdqst.create(new Question(usr.getId(), pergunta, palavrasChave));
+			}
+		}
+
+		return true;
+	}
+
+	public static boolean listQuestion() throws Exception
+	{
+		System.out.println("Minhas Perguntas");
+		
+		System.out.println("Pressione qualquer tecla para continuar...");
+		Main.scn.next();
+		return true;
 	}
 }
