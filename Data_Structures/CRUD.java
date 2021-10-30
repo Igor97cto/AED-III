@@ -77,6 +77,11 @@ public class CRUD <T extends Register>
 		raf= new RandomAccessFile(USER_DIR + "/" + FOLDER_NAME
 			+ "/" +this.FILE_NAME, "rw");
 
+		//Cria indice hash de ID e endereco
+		ideix= new HashExtensivel<>(ParIDEndereco.class.getConstructor(), 4,
+		USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_ideix.db",
+			USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_ideix.db");
+
 		//Número de registros
 		if(raf.length()== 0)
 		{
@@ -115,10 +120,7 @@ public class CRUD <T extends Register>
 		raf.writeInt(ba.length); //size of the register
 		raf.write(ba);//register
 
-		//Cria indice hash de ID e endereco
-		ideix= new HashExtensivel<>(ParIDEndereco.class.getConstructor(), 4,
-        USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_ideix.db",
-            USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_ideix.db");
+		ideix.create(new ParIDEndereco(lastid, raf.getFilePointer()));
 
 		return lastid;
 	}
@@ -257,6 +259,7 @@ public class CRUD <T extends Register>
 		byte[] ba;
 		ByteArrayInputStream bais;
 		DataInputStream dis;
+
 
 		if(ideix.read(id) != null)
 		{
