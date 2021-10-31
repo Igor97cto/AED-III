@@ -6,12 +6,15 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
 public class CRUDQuestion extends CRUD <Question> {
+
+    private final static String FILE_NAME= "question_data";
+    private final static String HASH_NAME= "question_hash";
     private ArvoreBMais <ParIdUsuarioPergunta> ixidpergunta; //par IdUsuario e IdPergunta
     private ListaInvertida lpchave; //Lista palavra chave
 
-    
-	public CRUDQuestion(String filename, Constructor<Question> cstr, boolean deletefolder) throws Exception{
-        super(filename, cstr, deletefolder);
+	public CRUDQuestion(Constructor<Question> cstr, boolean deletefolder) throws Exception{
+
+        super(FILE_NAME, HASH_NAME, cstr, deletefolder);
 
         ixidpergunta = new ArvoreBMais<>(ParIdUsuarioPergunta.class.getConstructor(), 4,
         FOLDER_NAME + "/usuario_pergunta.db");

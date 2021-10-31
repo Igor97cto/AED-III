@@ -59,7 +59,7 @@ public class Controller
 		int escolha = -1;
 		String email;
 		String password;
-		User usr = null;
+		usr = null;
 
 		System.out.println("Insira o email: ");
 		Main.scn.nextLine();
@@ -99,12 +99,13 @@ public class Controller
 	}
 
 
-	public static boolean readQuestion() throws Exception
+	public static boolean createQuestion() throws Exception
 	{
 		String pergunta;
 		String palavrasChave;
 		char confirmacao;
 
+		Main.scn.nextLine();
 		System.out.print("Escreva a sua pergunta: ");
 		pergunta = Main.scn.nextLine();
 		
@@ -119,7 +120,8 @@ public class Controller
 			{
 				palavrasChave = palavrasChave + ';';
 				palavrasChave = deAccent(palavrasChave);
-				palavrasChave.toLowerCase();
+				palavrasChave = palavrasChave.toLowerCase();
+				palavrasChave = palavrasChave.replaceAll(",", "");
 				palavrasChave = palavrasChave.replaceAll(" ", ";");
 				Main.crdqst.create(new Question(usr.getId(), pergunta, palavrasChave));
 			}
@@ -132,7 +134,6 @@ public class Controller
 	public static boolean listQuestion() throws Exception
 	{
 		Question [] qsta;
-		String cont;
 
 		System.out.println("Minhas Perguntas");
 		qsta= Main.crdqst.list(usr.getId());

@@ -8,8 +8,8 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		scn = new Scanner(System.in);
-		crdusr = new CRUDUser("user_data", User.class.getConstructor(new Class[] { byte[].class }), false);
-		crdqst = new CRUDQuestion("user_data", Question.class.getConstructor(new Class[] { byte[].class }), false);
+		crdusr = new CRUDUser(User.class.getConstructor(new Class[] { byte[].class }), false);
+		crdqst = new CRUDQuestion(Question.class.getConstructor(new Class[] { byte[].class }), false);
 		View.menuAccess();
 		
 	}

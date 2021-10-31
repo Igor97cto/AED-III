@@ -19,6 +19,7 @@ public class Question implements Register
 
 	public Question(int idUsuario)
 	{
+		this.date= new Date();
 		this.idPergunta = -1;
 		this.idUsuario = idUsuario;
 		this.criacao = -1;
@@ -30,6 +31,7 @@ public class Question implements Register
 
 	public Question(int idUsuario, String pergunta, String palavrasChave)
 	{
+		this.date= new Date();
 		this.idPergunta = -1;
 		this.idUsuario = idUsuario;
 		this.criacao = date.getTime();
@@ -137,8 +139,11 @@ public class Question implements Register
 	@Override
 	public String toString()
 	{
-		return "IdPergunta: " + getId() + "\n" + "Data: " + getCriacao() + "\n" + "Nota: " + getNota() + "\n"
-				+ "Pergunta: " + getPergunta() + "\n" + "Palavras-chave: " + getPC() + "\n";
+		return "IdPergunta: " + getId() 
+				+ "\n" + "Data: " + new Date(getCriacao())
+				+ "\n" + "Nota: " + getNota()
+				+ "\n" + "Pergunta: " + getPergunta()
+				+ "\n" + "Palavras-chave: " + getPC() + "\n";
 	}
 
 }

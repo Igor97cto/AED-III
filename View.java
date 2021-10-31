@@ -83,7 +83,7 @@ public class View
 			return Controller.listQuestion();
 
 		case 2:
-			return Controller.readQuestion();
+			return Controller.createQuestion();
 
 		case 3:
 			return Controller.updateQuestion();

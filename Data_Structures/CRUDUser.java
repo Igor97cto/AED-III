@@ -6,12 +6,14 @@ import java.io.DataInputStream;
 
 public class CRUDUser extends CRUD <User>
 {
+    private final static String FILE_NAME= "user_data";
+    private final static String HASH_NAME= "user_hash";
   	private HashExtensivel<ParEmailID> ixemailid;//index EmailId
 
 
-    public CRUDUser(String filename, Constructor<User> cstr, boolean deletefolder) throws Exception
+    public CRUDUser(Constructor<User> cstr, boolean deletefolder) throws Exception
     {
-        super(filename, cstr, deletefolder);
+        super(FILE_NAME, HASH_NAME, cstr, deletefolder);       
 
         //Cria indice hash de Email e ID
         ixemailid= new HashExtensivel<>(ParEmailID.class.getConstructor(), 4,

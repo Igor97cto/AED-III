@@ -47,10 +47,10 @@ public class CRUD <T extends Register>
 	 * 
 	 * @param filename nome do arquivo a escolha
 	 * @param cstr construtor do objeto da classe generica compativel
-	 * @throws Exception para excecao de qualquer natureza
+	 * @throws Exception para qualquer execption.
 	 */
-
-	public CRUD(String filename, Constructor<T> cstr, boolean deletefolder) throws Exception
+	  
+	public CRUD(String filename, String hashname, Constructor<T> cstr, boolean deletefolder) throws Exception
 	{
 		this.cstr= cstr;
 		this.FILE_FORMAT= ".bin";
@@ -79,8 +79,8 @@ public class CRUD <T extends Register>
 
 		//Cria indice hash de ID e endereco
 		ideix= new HashExtensivel<>(ParIDEndereco.class.getConstructor(), 4,
-		USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_d_ideix.db",
-			USER_DIR + "/" + FOLDER_NAME + "/" + ".hash_c_ideix.db");
+		USER_DIR + "/" + FOLDER_NAME + "/" + hashname +"_d_ideix.db",
+			USER_DIR + "/" + FOLDER_NAME + "/" + hashname +"_c_ideix.db");
 
 		//Número de registros
 		if(raf.length()== 0)
@@ -114,13 +114,13 @@ public class CRUD <T extends Register>
 		raf.writeInt(lastid);
 		raf.seek(raf.length());
 
+		ideix.create(new ParIDEndereco(lastid, raf.getFilePointer()));
+
 		byte[] ba= obj.toByteArray();
 
 		raf.writeByte(0); //gravestone
 		raf.writeInt(ba.length); //size of the register
 		raf.write(ba);//register
-
-		ideix.create(new ParIDEndereco(lastid, raf.getFilePointer()));
 
 		return lastid;
 	}
