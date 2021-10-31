@@ -135,7 +135,7 @@ public class Controller
 	{
 		Question [] qsta;
 
-		System.out.println("Minhas Perguntas");
+		System.out.println("\nMinhas Perguntas");
 		qsta= Main.crdqst.list(usr.getId());
 
 		for (Question q : qsta) {
