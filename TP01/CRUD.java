@@ -52,7 +52,7 @@ public class CRUD <T extends Register> {
 
 		if(raf.length()== 0)
 		{
-			raf.writeInt(0);
+			raf.writeInt(0);			//Escreve o id inicial
 		}
 	}
 
@@ -80,18 +80,66 @@ public class CRUD <T extends Register> {
 	}
 
 
-	/** 
-	 * Cria um novo registro no arquivo a partir de um objeto passado como
-	 * parametro.
-	 * 
-	 * O metodo le o ultimo id do cabecalho e atualiza com o novo id do registro
-	 * a ser criado. Em seguida, insere no final do arquivo, um lapide vazio, o
-	 * tamanho do vetor de dados provido pelo objeto e o vetor de dados ao
-	 * final.
-	 * 
-	 * @param obj e o objeto a ser transformado em registro no arquivo
-	 * @throws Exception para excecao de qualquer natureza
-	 */
+	//Metodos auxiliares
+
+	public long getRegPosition(int id) throws Exception
+	{
+		boolean grave= false;
+		byte[] buffer= null;
+		int regsize= 0;
+		long headersize= 4;
+		long hp= headersize;
+		T obj= null;
+
+		raf.seek(headersize);
+
+		do
+		{
+			try
+			{
+				hp= raf.getFilePointer();
+				grave= (raf.readByte() & 1)== 0;
+				regsize= raf.readInt();
+				buffer= new byte[regsize];
+				raf.read(buffer);
+
+				if(grave)
+				obj= cstr.newInstance(buffer);
+			}
+			catch(Exception e)
+			{
+				return -1;
+			}
+		}while(obj== null || obj.getId() != id);
+
+		return hp;
+	}
+
+	public T getObjByPointer(long hp) throws Exception {
+
+		boolean grave= false;
+		byte[] buffer= null;
+		int regsize= 0;
+		T obj= null;
+		
+		if(hp > 0)
+		{
+			raf.seek(hp);
+
+			grave= (raf.readByte() & 1)== 0;
+			regsize= raf.readInt();
+			buffer= new byte[regsize];
+			raf.read(buffer);
+
+			if(grave)
+			obj= cstr.newInstance(buffer);
+		}
+
+		return obj;
+	}
+
+	//Métodos do CRUD
+
 	public void create(T obj) throws Exception{
 
 		raf.seek(0);
@@ -109,4 +157,8 @@ public class CRUD <T extends Register> {
 		raf.write(ba);				//escreve o registro
 	}    
 
+	public T read(int id) throws Exception
+	{
+		return getObjByPointer(getRegPosition(id));
+	}
 }
