@@ -26,34 +26,10 @@ public class CRUD <T extends Register> {
 
 		fp= new File(USER_DIR + "/" + FOLDER_NAME);
 
-		if(DELETE_DB)   				//Para testes
-		{
-			delDB();
-		}
+		if(DELETE_DB)
+		delDB();						//Para testes		
 
 		initDB();
-	}
-
-
-	private void initDB () throws Exception {
-
-		if(!(fp.exists())){
-
-			if(!(fp.mkdir())){
-			
-				throw new FileNotFoundException
-				("Impossível criar ou localizar pasta de dados");
-			}
-			
-		}
-
-		raf= new RandomAccessFile
-		(USER_DIR + "/" + FOLDER_NAME + "/" +this.FILE_NAME, "rw");
-
-		if(raf.length()== 0)
-		{
-			raf.writeInt(0);			//Escreve o id inicial
-		}
 	}
 
 
@@ -77,6 +53,27 @@ public class CRUD <T extends Register> {
 			("Impossível deletar ou localizar pasta de dados");
 		}
 
+	}
+
+	private void initDB () throws Exception {
+
+		if(!(fp.exists())){
+
+			if(!(fp.mkdir())){
+			
+				throw new FileNotFoundException
+				("Impossível criar ou localizar pasta de dados");
+			}
+			
+		}
+
+		raf= new RandomAccessFile
+		(USER_DIR + "/" + FOLDER_NAME + "/" +this.FILE_NAME, "rw");
+
+		if(raf.length()== 0)
+		{
+			raf.writeInt(0);			//Escreve o id inicial
+		}
 	}
 
 
@@ -117,21 +114,16 @@ public class CRUD <T extends Register> {
 
 	public T getObjByPointer(long hp) throws Exception {
 
-		boolean grave= false;
 		byte[] buffer= null;
-		int regsize= 0;
+		int regsize= 0;					
 		T obj= null;
 		
 		if(hp > 0)
 		{
-			raf.seek(hp);
-
-			grave= (raf.readByte() & 1)== 0;
+			raf.seek(++hp);
 			regsize= raf.readInt();
 			buffer= new byte[regsize];
 			raf.read(buffer);
-
-			if(grave)
 			obj= cstr.newInstance(buffer);
 		}
 
@@ -160,5 +152,54 @@ public class CRUD <T extends Register> {
 	public T read(int id) throws Exception
 	{
 		return getObjByPointer(getRegPosition(id));
+	}
+
+	public boolean update(T obj) throws Exception
+	{
+		long hp= getRegPosition(obj.getId());
+		byte[] buffer= null;
+		int regsize= 0;
+
+		if(hp > 0)
+		{
+			raf.seek(hp + 1);
+			regsize= raf.readInt();
+			buffer= obj.toByteArray();
+
+			if(buffer.length <= regsize)
+			{
+				raf.writeInt(buffer.length);
+				raf.write(buffer);
+				return true;
+			}
+			else
+			{
+				raf.seek(hp);
+				raf.writeByte(1);
+
+				raf.seek(raf.length());
+				raf.writeByte(0); //gravestone
+				raf.writeInt(buffer.length); //size of the register
+				raf.write(buffer);//register
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public T delete(int id)throws Exception
+	{
+		long hp= getRegPosition(id);
+		T obj= null;
+
+		if(hp > 0)
+		{
+			obj= getObjByPointer(hp);
+			raf.seek(hp);
+			raf.writeByte(1);
+		}
+
+		return obj;
 	}
 }
