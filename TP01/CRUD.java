@@ -23,6 +23,7 @@ public class CRUD <T extends Register> {
 		this.FILE_NAME= filename + FILE_FORMAT;
 		this.USER_DIR= System.getProperty("user.dir");
 		this.DELETE_DB= true;   		//Para testes
+		this.cstr= cstr;
 
 		fp= new File(USER_DIR + "/" + FOLDER_NAME);
 
