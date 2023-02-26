@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -87,11 +88,58 @@ public class Show implements Register {
         this.description = description;
     }
 
-    public Show(byte[] adata) throws Exception {
-        ByteArrayInputStream bais = new ByteArrayInputStream(adata);
+    public Show(byte[] showByteArray) throws Exception {
+        ByteArrayInputStream bais = new ByteArrayInputStream(showByteArray);
         DataInputStream dis = new DataInputStream(bais);
 
-        show_id = dis.readInt();
+        setId(dis.readInt());
+        setType(dis.readUTF());
+        setTitle(dis.readUTF());
+
+        int directorsLength = dis.readInt();
+        String[] directors = new String[directorsLength];
+
+        for (int i = 0; i < directorsLength; i++) {
+            directors[i] = dis.readUTF();
+        }
+
+        setDirector(directors);
+
+        int castLength = dis.readInt();
+        String[] cast = new String[castLength];
+
+        for (int i = 0; i < castLength; i++) {
+            cast[i] = dis.readUTF();
+        }
+
+        setCast(cast);
+
+        int countriesLength = dis.readInt();
+        String[] countries = new String[countriesLength];
+
+        for (int i = 0; i < countriesLength; i++) {
+            countries[i] = dis.readUTF();
+        }
+
+        setCountry(countries);
+
+        LocalDate date_added = Instant.ofEpochMilli(dis.readLong()).atZone(ZoneOffset.UTC).toLocalDate();
+
+        setDate_added(date_added);
+        setRelease_year(dis.readInt());
+        setRating(dis.readUTF());
+        setDuration(dis.readUTF());
+
+        int listedInLength = dis.readInt();
+        String[] listed_in = new String[listedInLength];
+
+        for (int i = 0; i < listedInLength; i++) {
+            listed_in[i] = dis.readUTF();
+        }
+
+        setListed_in(listed_in);
+
+        setDescription(dis.readUTF());
     }
 
     public void setCast(String[] cast) {
@@ -574,7 +622,7 @@ public class Show implements Register {
             dos.writeUTF(countries[i]);
         }
 
-        dos.writeLong(getDate_added().toEpochDay());
+        dos.writeLong(getDate_added().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
         dos.writeInt(getRelease_year());
         dos.writeUTF(getRating());
         dos.writeUTF(getDuration());
@@ -627,9 +675,9 @@ public class Show implements Register {
 
         setCountry(countries);
 
-        // LocalDate date_added = Instant.ofEpochMilli(dis.readLong()).atZone(ZoneId.systemDefault()).toLocalDate();
-        // setDate_added(date_added);
-        System.out.println(Instant.ofEpochMilli(dis.readLong()).atZone(ZoneId.systemDefault()).toLocalDate());
+        LocalDate date_added = Instant.ofEpochMilli(dis.readLong()).atZone(ZoneOffset.UTC).toLocalDate();
+
+        setDate_added(date_added);
         setRelease_year(dis.readInt());
         setRating(dis.readUTF());
         setDuration(dis.readUTF());
@@ -650,7 +698,16 @@ public class Show implements Register {
     public String toString() {
         return "\nCodigo: " + getId() +
                 "\nTipo: " + getType() +
-                "\nTitulo: " + getTitle();
+                "\nTitulo: " + getTitle() + 
+                "\nDiretor: " + Arrays.toString(getDirector()) +
+                "\nElento: " + Arrays.toString(getCast()) + 
+                "\nPais: " + Arrays.toString(getCountry()) +
+                "\nData de inclusao: " + getDate_added() +
+                "\nAno de lancamento: " + getRelease_year() +
+                "\nClassificacao: " + getRating() +
+                "\nDuracao: " + getDuration() +
+                "\nListado em: " + Arrays.toString(getListed_in()) +
+                "\nDescricao: " + getDescription();
 
     }
 }
