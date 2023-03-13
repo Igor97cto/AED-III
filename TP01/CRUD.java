@@ -51,7 +51,7 @@ public class CRUD <T extends Register> {
 		else
 		{
 			throw new FileNotFoundException
-			("Impossível deletar ou localizar pasta de dados");
+			("Erro: Impossível deletar ou localizar pasta de dados");
 		}
 
 	}
@@ -63,7 +63,7 @@ public class CRUD <T extends Register> {
 			if(!(fp.mkdir())){
 			
 				throw new FileNotFoundException
-				("Impossível criar ou localizar pasta de dados");
+				("Erro: Impossível criar ou localizar pasta de dados");
 			}
 			
 		}
@@ -169,13 +169,14 @@ public class CRUD <T extends Register> {
 
 			if(buffer.length <= regsize)
 			{
+				raf.seek(hp);
 				raf.writeInt(buffer.length);
 				raf.write(buffer);
 				return true;
 			}
 			else
 			{
-				raf.seek(hp);
+				raf.seek(hp - 1);
 				raf.writeByte(1);
 
 				raf.seek(raf.length());
