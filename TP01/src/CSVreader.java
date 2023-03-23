@@ -1,3 +1,4 @@
+package src;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 
 public class CSVreader {
     
-    private final String FPATH;
+    private final String PATH;
 
     private BufferedReader breader;
     private int fieldnum;
@@ -18,8 +19,8 @@ public class CSVreader {
     public CSVreader(String path) throws NullPointerException,
         FileNotFoundException, IOException{
 
-        this.FPATH= path;
-        breader= new BufferedReader (new FileReader(FPATH));
+        this.PATH= path;
+        breader= new BufferedReader (new FileReader(PATH));
         fields = readLine();
         fieldnum= fields.length;
     }

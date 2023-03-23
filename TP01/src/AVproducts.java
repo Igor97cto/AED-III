@@ -1,3 +1,4 @@
+package src;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -10,9 +11,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.TimeZone;
 
-public class AVproducts {
+public class AVproducts implements Register {
     
-    private int show_id;
+    private int id;
     private String type;
     private String title;
     private String director;
@@ -37,7 +38,7 @@ public class AVproducts {
         DateTimeFormatter dtyear=
             DateTimeFormatter.ofPattern("yyyy");//only year
 
-        this.show_id = -1;
+        this.id = -1;
         this.type = type;
         this.title = title;
         this.director = director;
@@ -60,7 +61,7 @@ public class AVproducts {
         DateTimeFormatter dtyear=
             DateTimeFormatter.ofPattern("yyyy");//only year
 
-        show_id= -1;
+        id= -1;
         type = csvdata[1];
         title = csvdata[2];
         director= csvdata[3];
@@ -83,7 +84,7 @@ public class AVproducts {
         ByteArrayInputStream input= new ByteArrayInputStream(regdata);
         DataInputStream reader= new DataInputStream(input);
 
-        show_id= reader.readInt();
+        id= reader.readInt();
         type = reader.readUTF();
         title = reader.readUTF();
         director= reader.readUTF();
@@ -107,7 +108,7 @@ public class AVproducts {
         ByteArrayOutputStream output= new ByteArrayOutputStream();
         DataOutputStream writer= new DataOutputStream(output);
 
-        writer.writeInt(show_id);
+        writer.writeInt(id);
         writer.writeUTF(type);
         writer.writeUTF(title);
         writer.writeUTF(director);
@@ -159,8 +160,8 @@ public class AVproducts {
     }
 
 
-    public int getShow_id() {
-        return show_id;
+    public int getId() {
+        return id;
     }
 
 
@@ -229,8 +230,8 @@ public class AVproducts {
     }
 
 
-    public void setShow_id(int show_id) {
-        this.show_id = show_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
 

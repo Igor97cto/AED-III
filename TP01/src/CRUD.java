@@ -1,7 +1,10 @@
+package src;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class CRUD <T extends Register> {
 	
@@ -16,7 +19,7 @@ public class CRUD <T extends Register> {
 	private RandomAccessFile raf;
 
 
-	public CRUD (String filename, Constructor<T> cstr) throws Exception {
+	public CRUD (String filename, Constructor<T> cstr) throws IOException {
 		
 		this.FILE_FORMAT= ".db";
 		this.FOLDER_NAME= "Data";
@@ -34,7 +37,7 @@ public class CRUD <T extends Register> {
 	}
 
 
-	private void delDB () throws Exception {
+	private void delDB () throws FileNotFoundException {
 
 		if(!(fp==null))
 		{
@@ -51,19 +54,20 @@ public class CRUD <T extends Register> {
 		else
 		{
 			throw new FileNotFoundException
-			("Erro: Impossível deletar ou localizar pasta de dados");
+			("Exceção: Impossível deletar ou localizar pasta de dados");
 		}
 
 	}
 
-	private void initDB () throws Exception {
+
+	private void initDB () throws IOException {
 
 		if(!(fp.exists())){
 
 			if(!(fp.mkdir())){
 			
 				throw new FileNotFoundException
-				("Erro: Impossível criar ou localizar pasta de dados");
+				("Exceção: Impossível criar ou localizar pasta de dados");
 			}
 			
 		}
@@ -80,8 +84,8 @@ public class CRUD <T extends Register> {
 
 	//Metodos auxiliares
 
-	public long getRegPosition(int id) throws Exception
-	{
+
+	public long getRegPosition(int id) throws IOException {
 		boolean grave= false;
 		byte[] buffer= null;
 		int regsize= 0;
@@ -113,7 +117,10 @@ public class CRUD <T extends Register> {
 		return hp;
 	}
 
-	public T getObjByPointer(long hp) throws Exception {
+
+	public T getObjByPointer(long hp) throws IOException,
+		InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
 
 		byte[] buffer= null;
 		int regsize= 0;					
@@ -131,9 +138,10 @@ public class CRUD <T extends Register> {
 		return obj;
 	}
 
+
 	//Métodos do CRUD
 
-	public void create(T obj) throws Exception{
+	public void create(T obj) throws IOException {
 
 		raf.seek(0);
 		int lastid= raf.readInt();
@@ -150,13 +158,17 @@ public class CRUD <T extends Register> {
 		raf.write(ba);				//escreve o registro
 	}    
 
-	public T read(int id) throws Exception
-	{
+
+	public T read(int id) throws IOException, InstantiationException,
+		IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException {
+
 		return getObjByPointer(getRegPosition(id));
 	}
 
-	public boolean update(T obj) throws Exception
-	{
+
+	public boolean update(T obj) throws IOException {
+
 		long hp= getRegPosition(obj.getId());
 		byte[] buffer= null;
 		int regsize= 0;
@@ -190,8 +202,11 @@ public class CRUD <T extends Register> {
 		return false;
 	}
 
-	public T delete(int id)throws Exception
-	{
+
+	public T delete(int id) throws IOException, InstantiationException,
+		IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException  {
+
 		long hp= getRegPosition(id);
 		T obj= null;
 
