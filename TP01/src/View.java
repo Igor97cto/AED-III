@@ -1,6 +1,6 @@
 package src;
 
-public class Interfaces {
+public class View {
     
     public static void getExpMessage(int opt){
 

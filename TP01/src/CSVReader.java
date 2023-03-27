@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 
 
-public class CSVreader {
+public class CSVReader {
     
     private final String PATH;
 
@@ -16,12 +16,16 @@ public class CSVreader {
     private String [] values;
     
 
-    public CSVreader(String path) throws NullPointerException,
-        FileNotFoundException, IOException{
+    public CSVReader(String path) throws FileNotFoundException, IOException {
 
         this.PATH= path;
         breader= new BufferedReader (new FileReader(PATH));
-        fields = readLine();
+
+        try {fields = readLine();}
+        catch (BadCSVFormatException bcfe) {
+            new BadCSVFormatException(new NullPointerException());
+        }//CSV vazio
+
         fieldnum= fields.length;
     }
  
@@ -30,24 +34,23 @@ public class CSVreader {
         breader.close();
     }
 
+    public String[] readLine () throws IOException, BadCSVFormatException {
 
-    public String[] readLine () throws IOException {
-
-        boolean lock= true;
+        boolean out= true;
         String buffer= breader.readLine();
         ArrayList <String> values= new ArrayList<>();
         StringBuilder stb= new StringBuilder();
 
         for(int i = 0; i < buffer.length(); i++)
         {
-            if(buffer.charAt(i) == ',' && lock) {
+            if(buffer.charAt(i) == ',' && out) {
 
                 values.add(stb.toString());
                 stb= new StringBuilder();
             }
             else if(buffer.charAt(i) == '\"') {
 
-                lock= !lock;
+                out= !out;
             }
             else
             {
@@ -58,6 +61,11 @@ public class CSVreader {
 
         values.add(stb.toString());
         this.values= values.toArray(new String[values.size()]);
+
+        if(fieldnum != this.values.length){
+
+            throw new BadCSVFormatException(fields, this.values);
+        }
 
         return this.values;
     }
